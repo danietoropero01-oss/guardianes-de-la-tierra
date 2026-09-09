@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Guardianes de la Tierra</title>
+<style>
+*{box-sizing:border-box} body{margin:0;font-family:"Trebuchet MS",Arial,sans-serif;background:linear-gradient(135deg,#8ee8ff,#b8f7c5);color:#173b35}
+.app{max-width:1450px;margin:auto;padding:18px}
+header{background:linear-gradient(135deg,#126b55,#1ca36c);border-radius:28px;padding:18px 25px;color:white;display:flex;justify-content:space-between;align-items:center;box-shadow:0 8px 20px #0002}
+h1{margin:0;font-size:clamp(28px,4vw,52px);text-shadow:3px 3px #07503f} .subtitle{font-size:18px}
+.stats{display:flex;gap:10px;flex-wrap:wrap}.stat{background:#fff;color:#174b40;border-radius:18px;padding:9px 15px;font-weight:bold;text-align:center}.stat b{display:block;font-size:23px;color:#118553}
+.main{display:grid;grid-template-columns:1fr 320px;gap:16px;margin-top:16px}
+.board{position:relative;min-height:720px;border-radius:30px;overflow:hidden;background:linear-gradient(#8fdcff 0 18%,#7ed36d 18%);box-shadow:0 8px 20px #0002;padding:22px}
+.scene{position:absolute;inset:0;background:
+radial-gradient(circle at 15% 20%,#fff 0 2%,transparent 3%),
+radial-gradient(circle at 82% 13%,#fff 0 2%,transparent 3%),
+linear-gradient(#9fe7ff 0 23%,#76cf68 23% 100%)}
+.scene:after{content:"";position:absolute;left:0;right:0;bottom:0;height:45%;background:linear-gradient(150deg,transparent 0 30%,#58b95b 31% 100%);opacity:.55}
+.land{position:absolute;inset:22% 2% 4%;border-radius:45%;background:#76d35d;box-shadow:inset 0 0 0 10px #4db64e;z-index:1}
+.water{position:absolute;right:5%;top:25%;width:35%;height:55%;background:#38bce9;border-radius:55% 35% 50% 40%;z-index:2;opacity:.95}
+.mountain{position:absolute;left:37%;top:12%;font-size:110px;z-index:3}.tree{position:absolute;font-size:55px;z-index:3}.t1{left:5%;top:28%}.t2{left:18%;top:45%}.t3{left:73%;top:30%}.t4{right:4%;bottom:10%}
+.sign{position:absolute;z-index:5;background:#7b421f;color:#fff4d2;padding:7px 18px;border-radius:15px;border:4px solid #9d5d2e;font-size:20px;font-weight:bold;transform:rotate(-2deg);box-shadow:0 4px 7px #0003}
+.s1{left:6%;top:27%}.s2{left:38%;top:25%}.s3{right:9%;top:28%}.s4{left:7%;bottom:28%}.s5{right:8%;bottom:23%}.s6{left:42%;bottom:11%}
+.path{position:absolute;z-index:6;left:8%;right:9%;top:39%;height:42%;display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(3,1fr);gap:8px;align-items:center}
+.cell{width:58px;height:58px;border-radius:50%;background:#fff;border:5px solid #2c9b57;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:bold;box-shadow:0 4px 7px #0003;cursor:pointer;transition:.15s}.cell:hover{transform:scale(1.08)}.cell:nth-child(3n){border-color:#178fd0}.cell:nth-child(4n){border-color:#d88c19}.cell:nth-child(5n){border-color:#a34dc2}
+.player{position:absolute;z-index:9;font-size:43px;filter:drop-shadow(2px 4px 2px #0005);transition:all .5s;pointer-events:none}
+.start{position:absolute;left:3%;top:53%;z-index:7;background:#ef7627;color:white;padding:12px 20px;border-radius:18px;font-size:22px;font-weight:bold;border:4px solid #fff}.goal{position:absolute;right:2%;bottom:31%;z-index:7;background:#159454;color:white;padding:12px 20px;border-radius:18px;font-size:22px;font-weight:bold;border:4px solid #fff}
+.panel{background:#ffffffee;border-radius:25px;padding:17px;box-shadow:0 8px 20px #0002}.panel h2{margin:0 0 12px;color:#126b55}
+button{width:100%;border:0;border-radius:17px;padding:14px;margin:6px 0;font-size:17px;font-weight:bold;cursor:pointer;box-shadow:0 4px 0 #0002}button:active{transform:translateY(2px);box-shadow:0 2px 0 #0002}
+.dice{background:#168de0;color:white;font-size:22px}.cards{background:#20a566;color:white}.reset{background:#e94747;color:white}
+.meter{height:25px;background:#ddd;border-radius:20px;overflow:hidden;border:3px solid #fff;box-shadow:inset 0 2px 4px #0002}.bar{height:100%;width:50%;background:linear-gradient(90deg,#e74c3c,#f1c40f,#27ae60);transition:.4s}
+.card{background:#f8fff0;border:4px solid #5ab65c;border-radius:20px;padding:14px;margin-top:10px}.card h3{margin:0 0 7px;color:#137c4e}.choice{background:#fff;border:3px solid #cbd9d2;text-align:left}.choice:hover{border-color:#1b9c66;background:#eafff3}.correct{background:#d7f8df!important;border-color:#20a456!important}.wrong{background:#ffe0e0!important;border-color:#e74c3c!important}
+.log{max-height:150px;overflow:auto;font-size:14px;background:#f1faf5;border-radius:15px;padding:10px}.log div{padding:5px;border-bottom:1px solid #d8eee2}
+.legend{display:grid;grid-template-columns:1fr 1fr;gap:7px;font-size:13px}.legend div{padding:9px;border-radius:12px;font-weight:bold}.eco{background:#d9f8dc}.know{background:#d9efff}.threat{background:#ffdcdc}.decision{background:#fff0bd}
+footer{margin-top:14px;text-align:center;background:#126b55;color:white;border-radius:18px;padding:12px;font-weight:bold}
+@media(max-width:900px){.main{grid-template-columns:1fr}.board{min-height:620px}.panel{order:2}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+<div><h1>🌎 GUARDIANES DE LA TIERRA</h1><div class="subtitle">🎮 Juego educativo interactivo • ¡Cada decisión cuenta!</div></div>
+<div class="stats"><div class="stat">Turno<b id="turn">1/10</b></div><div class="stat">Puntos<b id="points">0</b></div></div>
+</header>
+
+<div class="main">
+<section class="board" id="board">
+<div class="scene"></div><div class="land"></div><div class="water"></div>
+<div class="mountain">⛰️</div><div class="tree t1">🌲</div><div class="tree t2">🌳</div><div class="tree t3">🌴</div><div class="tree t4">🌳</div>
+<div class="sign s1">🌳 BOSQUE</div><div class="sign s2">💧 RÍO</div><div class="sign s3">🌊 OCÉANO</div>
+<div class="sign s4">🌿 HUMEDAL</div><div class="sign s5">🏙️ CIUDAD SOSTENIBLE</div><div class="sign s6">⛰️ MONTAÑA</div>
+<div class="start">🚩 INICIO</div><div class="goal">🏆 META</div>
+<div class="path" id="path"></div><div class="player" id="player">🧑‍🌾</div>
+</section>
+
+<aside class="panel">
+<h2>🎮 Panel del jugador</h2>
+<div style="text-align:center;font-size:18px;margin-bottom:8px">👤 Jugador: <b>Guardian</b></div>
+<button class="dice" id="roll">🎲 LANZAR DADO</button>
+<div id="diceResult" style="text-align:center;font-size:30px;font-weight:bold">🎲 —</div>
+<button class="cards" id="newCard">🃏 SACAR TARJETA</button>
+<div class="card" id="cardBox"><h3>🌱 ¡Listos para jugar!</h3><p>Lanza el dado para comenzar tu aventura.</p></div>
+<h2 style="margin-top:15px">🌎 Equilibrio de la Tierra</h2>
+<div class="meter"><div class="bar" id="bar"></div></div>
+<div style="text-align:center;font-weight:bold;margin:5px"><span id="balance">50</span>/100</div>
+<div id="status" style="text-align:center;font-weight:bold">🟡 En equilibrio</div>
+<h2 style="margin-top:15px">🧾 Movimientos</h2>
+<div class="log" id="log"><div>🌱 El juego está listo. ¡Lanza el dado!</div></div>
+<button class="reset" id="reset">🔄 REINICIAR JUEGO</button>
+<h2>🃏 Tipos de tarjetas</h2>
+<div class="legend"><div class="eco">🟢 Eco-Misión</div><div class="know">🔵 Conocimiento</div><div class="threat">🔴 Amenaza</div><div class="decision">🟡 Decisión</div></div>
+</aside>
+</div>
+<footer>🌱 Aprender • 🎲 Jugar • 💭 Reflexionar • 🌎 Actuar</footer>
+</div>
+
+<script>
+const cells=[...Array(24)].map((_,i)=>i);
+const path=document.getElementById('path'), board=document.getElementById('board'), player=document.getElementById('player');
+cells.forEach(i=>{const d=document.createElement('div');d.className='cell';d.textContent=i+1;d.id='c'+i;path.appendChild(d)});
+let pos=0, turn=1, points=0, balance=50, awaiting=false;
+const cards=[
+{type:'Eco-Misión',color:'eco',q:'🌊 Encuentras basura cerca de un río. ¿Qué haces?',a:['Ignorarla','Organizar una jornada de limpieza','Tirar más basura'],good:1,p:3,b:4},
+{type:'Conocimiento',color:'know',q:'🌳 ¿Qué acción ayuda a conservar la biodiversidad?',a:['Deforestar el bosque','Proteger los hábitats','Cazar especies'],good:1,p:3,b:3},
+{type:'Amenaza ambiental',color:'threat',q:'🏭 Una fábrica contamina un río. ¿Cuál es una consecuencia?',a:['Mejora del agua','Pérdida de vida acuática','Más biodiversidad'],good:1,p:0,b:-5},
+{type:'Decisión',color:'decision',q:'🏙️ ¿Qué opción es más sostenible para una ciudad?',a:['Eliminar zonas verdes','Usar energías renovables y transporte limpio','Aumentar la contaminación'],good:1,p:4,b:4},
+{type:'Conocimiento',color:'know',q:'💧 ¿Por qué debemos ahorrar agua?',a:['Porque es un recurso limitado','Porque no sirve para los ecosistemas','Porque siempre sobra'],good:0,p:3,b:3},
+{type:'Amenaza ambiental',color:'threat',q:'🌲 Se talan muchos árboles sin reforestación. ¿Qué puede ocurrir?',a:['Aumenta el hábitat','Pérdida de biodiversidad y erosión','Mejora el suelo'],good:1,p:0,b:-5},
+{type:'Eco-Misión',color:'eco',q:'♻️ Elige una acción de economía circular.',a:['Reutilizar y reparar objetos','Usar y desechar todo','Comprar sin necesidad'],good:0,p:3,b:3},
+{type:'Decisión',color:'decision',q:'☀️ ¿Qué fuente ayuda a disminuir emisiones?',a:['Carbón','Energía solar','Quema de residuos'],good:1,p:3,b:3}
+];
+function log(t){const e=document.createElement('div');e.textContent=t;document.getElementById('log').prepend(e)}
+function update(){
+ document.getElementById('turn').textContent=Math.min(turn,10)+'/10';document.getElementById('points').textContent=points;
+ document.getElementById('balance').textContent=balance;document.getElementById('bar').style.width=balance+'%';
+ document.getElementById('status').textContent=balance>=80?'🟢 Planeta protegido':balance>=60?'🟢 En recuperación':balance>=40?'🟡 En riesgo':'🔴 Emergencia ambiental';
+}
+function placePlayer(){
+ const c=document.getElementById('c'+pos); if(!c)return;
+ const r=c.getBoundingClientRect(), br=board.getBoundingClientRect();
+ player.style.left=(r.left-br.left+r.width/2-22)+'px';player.style.top=(r.top-br.top+r.height/2-22)+'px';
+}
+function showCard(){
+ const card=cards[Math.floor(Math.random()*cards.length)]; awaiting=true;
+ const box=document.getElementById('cardBox');box.innerHTML='<h3>🃏 '+card.type+'</h3><p><b>'+card.q+'</b></p>';
+ card.a.forEach((x,i)=>{const b=document.createElement('button');b.className='choice';b.textContent=String.fromCharCode(65+i)+'. '+x;b.onclick=()=>answer(card,i,b);box.appendChild(b)});
+}
+function answer(card,i,btn){
+ if(!awaiting)return; awaiting=false;
+ [...document.querySelectorAll('.choice')].forEach(x=>x.disabled=true);
+ if(i===card.good){btn.classList.add('correct');points+=card.p;balance=Math.min(100,balance+card.b);document.getElementById('cardBox').innerHTML+='<p style="color:#16834d;font-size:18px"><b>✅ ¡Correcto! +'+card.p+' puntos y +'+card.b+' equilibrio.</b></p>';log('✅ Respuesta correcta: +'+card.p+' puntos.');}
+ else{btn.classList.add('wrong');points=Math.max(0,points-1);balance=Math.max(0,balance-3);document.getElementById('cardBox').innerHTML+='<p style="color:#c33;font-size:18px"><b>❌ No es la mejor opción. -3 equilibrio.</b></p>';log('❌ Respuesta incorrecta: -3 equilibrio.');}
+ update(); setTimeout(()=>{if(turn<10&&pos<23){turn++;awaiting=false;document.getElementById('cardBox').innerHTML='<h3>🌱 ¡Tu turno continúa!</h3><p>Lanza el dado para avanzar.</p>';}else endGame()},900);
+}
+function endGame(){document.getElementById('roll').disabled=true;document.getElementById('newCard').disabled=true;let m=balance>=80?'🏆 ¡Planeta protegido!':balance>=60?'🌱 ¡La Tierra se está recuperando!':balance>=40?'⚠️ El planeta está en riesgo.':'🚨 Emergencia ambiental.';document.getElementById('cardBox').innerHTML='<h3>'+m+'</h3><p><b>Partida terminada.</b> Puntos: '+points+' • Equilibrio: '+balance+'/100.</p>';log('🏁 Fin de la partida. '+m)}
+document.getElementById('roll').onclick=()=>{
+ if(awaiting)return;
+ const n=Math.floor(Math.random()*6)+1;document.getElementById('diceResult').textContent='🎲 '+n;
+ const old=pos;pos=Math.min(23,pos+n);log('🎲 Sacaste '+n+' y avanzaste hasta la casilla '+(pos+1)+'.');placePlayer();
+ document.getElementById('cardBox').innerHTML='<h3>🗺️ ¡Avanzaste!</h3><p>Estás en la casilla <b>'+(pos+1)+'</b>. Ahora saca una tarjeta.</p>';
+ document.getElementById('newCard').disabled=false;
+ if(pos===23){setTimeout(endGame,500)}
+};
+document.getElementById('newCard').onclick=showCard;
+document.getElementById('reset').onclick=()=>location.reload();
+window.addEventListener('resize',placePlayer);setTimeout(placePlayer,100);
+</script>
+</body></html>
